@@ -1,5 +1,17 @@
 name: "SonarCloud analysis, build and Nexus deployment"
-on: workflow_call
+on: 
+  workflow_call:
+    secrets:
+      NEXUS_PASSWORD:
+        required: true
+      NEXUS_USERNAME:
+        required: true
+      NEXUS_URL:
+        required: true
+      LEANSPACE_BOT_TOKEN:
+        required: true
+      SONAR_TOKEN:
+        required: true
 jobs:
   build-deploy:
     runs-on: ubuntu-latest
