@@ -14,18 +14,20 @@ jobs:
     steps:
       - name: Set env
         run: echo "ARTIFACT_IDENTIFIER=0.1.${GITHUB_RUN_NUMBER}_${GITHUB_SHA:0:6}" >> $GITHUB_ENV
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::603457443348:role/GithubActionsECRAccess
+          aws-region: eu-central-1
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
       - name: Build
         uses: docker/build-push-action@v2
         with:
           push: false
           build-args: ${{ inputs.BUILD-ARGS }}
           tags: "603457443348.dkr.ecr.eu-central-1.amazonaws.com/${{ github.event.repository.name }}:${{ env.ARTIFACT_IDENTIFIER }}"
-      - name: Configure AWS Credentials
-        if: github.ref_name == 'master'
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          role-to-assume: arn:aws:iam::603457443348:role/GithubActionsECRAccess
-          aws-region: eu-central-1
       - name: Push image to ECR
         if: github.ref_name == 'master'
         run: "docker push 603457443348.dkr.ecr.eu-central-1.amazonaws.com/${{ github.event.repository.name }}:${ARTIFACT_IDENTIFIER}"
