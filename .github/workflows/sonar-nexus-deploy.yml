@@ -16,6 +16,7 @@ jobs:
   build-deploy:
     runs-on: ubuntu-latest
     env:
+        AWS_REGION: eu-central-1
         NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
         NEXUS_USERNAME: ${{ secrets.NEXUS_USERNAME }}
         NEXUS_URL: ${{ secrets.NEXUS_URL }}
