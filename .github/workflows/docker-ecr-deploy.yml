@@ -2,7 +2,10 @@ name: "Docker build and push to ecr"
 on: 
   workflow_call:
     inputs:
-      BUILD-ARGS:
+      needs-intermediate-artifact:
+        required: true
+        type: boolean
+      build-args:
         required: false
         type: string
 jobs: 
@@ -27,6 +30,7 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
       - name: Download jar artifact
+        if: inputs.needs-intermediate-artifact == true
         with:
           name: output-jar
         uses: actions/download-artifact@v3
@@ -35,7 +39,7 @@ jobs:
         with:
           push: false
           context: .
-          build-args: ${{ inputs.BUILD-ARGS }}
+          build-args: ${{ inputs.build-args }}
           tags: "603457443348.dkr.ecr.eu-central-1.amazonaws.com/${{ github.event.repository.name }}:${{ env.ARTIFACT_IDENTIFIER }}"
       - name: Push image to ECR
         if: github.ref_name == 'master'
