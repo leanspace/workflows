@@ -1,6 +1,10 @@
 name: "SonarCloud analysis, build and Nexus deployment"
 on: 
   workflow_call:
+    inputs:
+      output-jar-path:
+        required: false
+        type: string
     secrets:
       NEXUS_PASSWORD:
         required: true
@@ -62,3 +66,10 @@ jobs:
     - name: Deploy to nexus
       if: github.ref_name == 'master'
       run: mvn deploy -DskipTests -gs config-files/maven/nexus-config.xml -Drevision=${ARTIFACT_IDENTIFIER}
+    # Only upload artifact if path is set
+    - name: 'Upload jar artifact'
+      if: ${{ inputs.output-jar-path != 0 }}
+      uses: actions/upload-artifact@v3
+      with:
+        name: output-jar
+        path: ${{ inputs.output-jar-path }}
