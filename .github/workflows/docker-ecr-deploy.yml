@@ -42,6 +42,10 @@ jobs:
           context: .
           build-args: ${{ inputs.build-args }}
           tags: "603457443348.dkr.ecr.eu-central-1.amazonaws.com/${{ github.event.repository.name }}:${{ env.ARTIFACT_IDENTIFIER }}"
-      - name: Push image to ECR
+      - name: Push image to ECR 
         if: github.ref_name == 'master'
-        run: "docker push 603457443348.dkr.ecr.eu-central-1.amazonaws.com/${{ github.event.repository.name }}:${ARTIFACT_IDENTIFIER}"
+        run: |
+          "docker push 603457443348.dkr.ecr.eu-central-1.amazonaws.com/${{ github.event.repository.name }}:${ARTIFACT_IDENTIFIER}"
+          "docker tag 603457443348.dkr.ecr.eu-central-1.amazonaws.com/${{ github.event.repository.name }}:${ARTIFACT_IDENTIFIER} 603457443348.dkr.ecr.eu-central-1.amazonaws.com/asset-repository:latest"
+          "docker push 603457443348.dkr.ecr.eu-central-1.amazonaws.com/${{ github.event.repository.name }}:latest"
+     
