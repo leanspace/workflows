@@ -2,12 +2,16 @@ name: "Docker build and push to ecr"
 on: 
   workflow_call:
     inputs:
+      build-args:
+        required: false
+        type: string
       needs-intermediate-artifact:
         required: false
         default: false
         type: boolean
-      build-args:
+      repo-name:
         required: false
+        default: ${{ github.event.repository.name }}
         type: string
 jobs: 
   dockerBuild-ECRpush:
@@ -41,11 +45,11 @@ jobs:
           push: false
           context: .
           build-args: ${{ inputs.build-args }}
-          tags: "603457443348.dkr.ecr.eu-central-1.amazonaws.com/${{ github.event.repository.name }}:${{ env.ARTIFACT_IDENTIFIER }}"
+          tags: "603457443348.dkr.ecr.eu-central-1.amazonaws.com/${{ inputs.repo-name }}:${{ env.ARTIFACT_IDENTIFIER }}"
       - name: Push image to ECR 
         if: github.ref_name == 'master'
         run: |
-          "docker push 603457443348.dkr.ecr.eu-central-1.amazonaws.com/${{ github.event.repository.name }}:${ARTIFACT_IDENTIFIER}"
-          "docker tag 603457443348.dkr.ecr.eu-central-1.amazonaws.com/${{ github.event.repository.name }}:${ARTIFACT_IDENTIFIER} 603457443348.dkr.ecr.eu-central-1.amazonaws.com/asset-repository:latest"
-          "docker push 603457443348.dkr.ecr.eu-central-1.amazonaws.com/${{ github.event.repository.name }}:latest"
+          "docker push 603457443348.dkr.ecr.eu-central-1.amazonaws.com/${{ inputs.repo-name }}:${ARTIFACT_IDENTIFIER}"
+          "docker tag 603457443348.dkr.ecr.eu-central-1.amazonaws.com/${{ inputs.repo-name }}:${ARTIFACT_IDENTIFIER} 603457443348.dkr.ecr.eu-central-1.amazonaws.com/asset-repository:latest"
+          "docker push 603457443348.dkr.ecr.eu-central-1.amazonaws.com/${{ inputs.repo-name }}:latest"
      
