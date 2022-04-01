@@ -2,9 +2,6 @@ name: "Trigger jenkins infra script"
 on: 
   workflow_call:
     inputs:
-      artifact-id:
-        required: true
-        type: string
       param: 
         required: true
         type: string
