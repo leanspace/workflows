@@ -45,7 +45,7 @@ jobs:
           push: false
           context: .
           build-args: ${{ inputs.build-args }}
-          tags: "603457443348.dkr.ecr.eu-central-1.amazonaws.com/${{ inputs.repo-name }}:${{ env.ARTIFACT_IDENTIFIER }}"
+          tags: "603457443348.dkr.ecr.eu-central-1.amazonaws.com/test:${{ env.ARTIFACT_IDENTIFIER }}"
       - name: Push image to ECR 
         # if: github.ref_name == 'master'
         run: |
