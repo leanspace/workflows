@@ -15,7 +15,7 @@ on:
         type: string
 jobs: 
   dockerBuild-ECRpush:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     permissions:
       id-token: write
       contents: read
@@ -49,16 +49,15 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v2
         with:
-          registry: ${{ steps.login-ecr.outputs.registry }}
           push: true
           context: .
           build-args: ${{ inputs.build-args }}
           tags: "603457443348.dkr.ecr.eu-central-1.amazonaws.com/test:${{ env.ARTIFACT_IDENTIFIER }}"
-      - name: Build and push with latest tag
-        uses: docker/build-push-action@v2
-        with:
-          registry: ${{ steps.login-ecr.outputs.registry }}
-          push: true
-          context: .
-          build-args: ${{ inputs.build-args }}
-          tags: "603457443348.dkr.ecr.eu-central-1.amazonaws.com/test:latest"
+      - name: Push image to ECR 
+        # if: github.ref_name == 'master'
+        run: |
+          "docker image ls"
+          "docker push 603457443348.dkr.ecr.eu-central-1.amazonaws.com/test:${ARTIFACT_IDENTIFIER}"
+          "docker tag 603457443348.dkr.ecr.eu-central-1.amazonaws.com/test:${ARTIFACT_IDENTIFIER} 603457443348.dkr.ecr.eu-central-1.amazonaws.com/test:latest"
+          "docker push 603457443348.dkr.ecr.eu-central-1.amazonaws.com/test:latest"
+     
