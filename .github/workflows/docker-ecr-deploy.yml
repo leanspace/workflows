@@ -53,6 +53,6 @@ jobs:
           push: true
           context: .
           build-args: ${{ inputs.build-args }}
-          tags: "test:${{ env.ARTIFACT_IDENTIFIER }}"
+          tags: "603457443348.dkr.ecr.eu-central-1.amazonaws.com/test:${{ env.ARTIFACT_IDENTIFIER }}"
       
      
