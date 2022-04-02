@@ -15,7 +15,7 @@ on:
         type: string
 jobs: 
   dockerBuild-ECRpush:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     permissions:
       id-token: write
       contents: read
@@ -32,8 +32,9 @@ jobs:
           role-to-assume: arn:aws:iam::603457443348:role/GithubActionsECRAccess
           aws-region: eu-central-1
       - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
+        uses: docker/login-action@v1
+        with:
+          registry: 603457443348.dkr.ecr.eu-central-1.amazonaws.com
       - name: Download jar artifact
         if: inputs.needs-intermediate-artifact == true
         with:
@@ -52,12 +53,6 @@ jobs:
           push: true
           context: .
           build-args: ${{ inputs.build-args }}
-          tags: "603457443348.dkr.ecr.eu-central-1.amazonaws.com/test:${{ env.ARTIFACT_IDENTIFIER }}"
-      - name: Push image to ECR 
-        # if: github.ref_name == 'master'
-        run: |
-          "docker image ls"
-          "docker push 603457443348.dkr.ecr.eu-central-1.amazonaws.com/test:${ARTIFACT_IDENTIFIER}"
-          "docker tag 603457443348.dkr.ecr.eu-central-1.amazonaws.com/test:${ARTIFACT_IDENTIFIER} 603457443348.dkr.ecr.eu-central-1.amazonaws.com/test:latest"
-          "docker push 603457443348.dkr.ecr.eu-central-1.amazonaws.com/test:latest"
+          tags: "test:${{ env.ARTIFACT_IDENTIFIER }}"
+      
      
