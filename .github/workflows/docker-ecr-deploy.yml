@@ -46,15 +46,16 @@ jobs:
           push: false
           context: .
           build-args: ${{ inputs.build-args }}
-          tags: "603457443348.dkr.ecr.eu-central-1.amazonaws.com/test:${{ env.ARTIFACT_IDENTIFIER }}"
+          tags: "603457443348.dkr.ecr.eu-central-1.amazonaws.com/${{ inputs.repo-name }}:${{ env.ARTIFACT_IDENTIFIER }}"
       - name: Build and push
+        if: github.ref_name == 'master'
         uses: docker/build-push-action@v2
         with:
           push: true
           context: .
           build-args: ${{ inputs.build-args }}
           tags: |
-            "603457443348.dkr.ecr.eu-central-1.amazonaws.com/test:${{ env.ARTIFACT_IDENTIFIER }}"
-            "603457443348.dkr.ecr.eu-central-1.amazonaws.com/test:latest"
+            "603457443348.dkr.ecr.eu-central-1.amazonaws.com/${{ inputs.repo-name }}:${{ env.ARTIFACT_IDENTIFIER }}"
+            "603457443348.dkr.ecr.eu-central-1.amazonaws.com/${{ inputs.repo-name }}:latest"
       
      
