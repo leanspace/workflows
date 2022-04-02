@@ -49,6 +49,7 @@ jobs:
       - name: Push image to ECR 
         # if: github.ref_name == 'master'
         run: |
+          "docker image ls"
           "docker push 603457443348.dkr.ecr.eu-central-1.amazonaws.com/test:${ARTIFACT_IDENTIFIER}"
           "docker tag 603457443348.dkr.ecr.eu-central-1.amazonaws.com/test:${ARTIFACT_IDENTIFIER} 603457443348.dkr.ecr.eu-central-1.amazonaws.com/test:latest"
           "docker push 603457443348.dkr.ecr.eu-central-1.amazonaws.com/test:latest"
