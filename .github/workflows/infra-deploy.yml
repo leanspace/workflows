@@ -18,5 +18,5 @@ jobs:
           jenkins_user: ${{ secrets.JENKINS_USER }}
           jenkins_token: ${{ secrets.JENKINS_TOKEN }}
           job_name: "leanspace/job/leanspace-infra/job/master"
-          job_params: ${{ format('{0}={1}&runIntegrationTests=false', inputs.param, env.ARTIFACT_IDENTIFIER) }}
+          job_params: ${{ format('{0}={1}', inputs.param, env.ARTIFACT_IDENTIFIER) }}
           async: true
