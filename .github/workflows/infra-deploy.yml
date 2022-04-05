@@ -1,23 +1,22 @@
 name: "Trigger jenkins infra script"
-on: 
+on:
   workflow_call:
     inputs:
-      param: 
+      param:
         required: true
         type: string
-jobs: 
+jobs:
   infra:
     runs-on: ubuntu-latest
     steps:
       - name: Set env
         run: echo "ARTIFACT_IDENTIFIER=0.1.${GITHUB_RUN_NUMBER}_${GITHUB_SHA:0:6}" >> $GITHUB_ENV
-      - name: Trigger jenkins
-        if: github.ref_name == 'master'
-        uses: fjogeleit/http-request-action@v1.8.2
+      - name: Trigger jenkins infra script
+        uses: toptal/jenkins-job-trigger-action@master
         with:
-          url: 'https://build.leanspace.io/jenkins/job/leanspace/job/leanspace-infra/job/master/buildWithParameters'
-          method: 'POST'
-          username: ${{ secrets.JENKINS_USER }}
-          password: ${{ secrets.JENKINS_TOKEN }}
-          data: ${{ format('{0}={1}&runIntegrationTests=false', inputs.param, env.ARTIFACT_IDENTIFIER) }}
-          customHeaders: '{ "Content-Type": "application/x-www-form-urlencoded" }'
+          jenkins_url: "https://build.leanspace.io/jenkins/"
+          jenkins_user: ${{ secrets.JENKINS_USER }}
+          jenkins_token: ${{ secrets.JENKINS_TOKEN }}
+          job_name: "leanspace/job/leanspace-infra/job/master"
+          job_params: ${{ format('{0}={1}&runIntegrationTests=false', inputs.param, env.ARTIFACT_IDENTIFIER) }}
+          async: true
