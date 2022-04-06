@@ -1,4 +1,4 @@
-name: "SonarCloud analysis, build and Nexus deployment"
+name: "SonarCloud analysis"
 on:
   workflow_call:
     inputs:
@@ -28,23 +28,6 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: ${{ inputs.node_version }}
-          cache: 'npm'
-      - name: Cache node modules
-        id: cache-nodemodules
-        uses: actions/cache@v2
-        env:
-          cache-name: cache-node-modules
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
+          cache: "npm"
       - name: Install dependencies
-        if: steps.cache-nodemodules.outputs.cache-hit != 'true' || github.ref_name == 'master'
         run: npm install --unsafe-perm
-      - name: Lint
-        run: npm run lint
-      - name: Test
-        run: npm run test
