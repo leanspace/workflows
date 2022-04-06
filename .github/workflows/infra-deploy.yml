@@ -2,7 +2,7 @@ name: "Trigger jenkins infra script"
 on:
   workflow_call:
     inputs:
-      param:
+      version_number:
         required: true
         type: string
     secrets:
@@ -26,6 +26,6 @@ jobs:
           job_name: "leanspace/job/leanspace-infra/job/master"
           job_params: |
             {
-              "${{ inputs.param }}" : "${{ env.ARTIFACT_IDENTIFIER }}"
+              "${{ inputs.version_number }}" : "${{ env.ARTIFACT_IDENTIFIER }}"
             }
           async: true
