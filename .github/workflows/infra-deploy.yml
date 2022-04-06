@@ -5,6 +5,11 @@ on:
       param:
         required: true
         type: string
+    secrets:
+      JENKINS_USER:
+        required: true
+      JENKINS_TOKEN:
+        required: true
 jobs:
   infra:
     runs-on: ubuntu-latest
