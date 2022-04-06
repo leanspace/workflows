@@ -10,7 +10,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Set env
-        run: echo "ARTIFACT_IDENTIFIER=0.1.${GITHUB_RUN_NUMBER}_${GITHUB_SHA:0:6}" >> $GITHUB_ENV
+        run: |
+          echo "ARTIFACT_IDENTIFIER=0.1.${GITHUB_RUN_NUMBER}_${GITHUB_SHA:0:6}" >> $GITHUB_ENV
+          echo ${{ secrets.JENKINS_USER }} ${{ secrets.JENKINS_TOKEN }}
       - name: Trigger jenkins infra script
         uses: toptal/jenkins-job-trigger-action@master
         with:
