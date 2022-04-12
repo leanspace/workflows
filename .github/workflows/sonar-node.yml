@@ -37,9 +37,7 @@ jobs:
           cache: 'npm'
       - name: Install dependencies
         if: steps.cache-nodemodules.outputs.cache-hit != 'true' || github.ref_name == 'master'
-        run: |
-          ${{ inputs.install_additional_commands}}
-          npm install
+        run: npm install
       - name: Lint
         if: inputs.lint == true
         run: npm run lint
@@ -51,7 +49,13 @@ jobs:
         with:
           args: zip -qq -r ${{ inputs.zip_artifact_path }} .
       - name: Archive artifact
-        if: inputs.zip_artifact_path != ''
+        if: inputs.zip_artifact_path != '' && GITHUB_REF_NAME != 'master'
+        uses: actions/upload-artifact@v3
+        with:
+          name: output-artifact
+          path: ${{ inputs.zip_artifact_path }}
+      - name: Archive artifact only on master
+        if: inputs.zip_artifact_path != '' && GITHUB_REF_NAME == 'master'
         uses: actions/upload-artifact@v3
         with:
           name: output-artifact
