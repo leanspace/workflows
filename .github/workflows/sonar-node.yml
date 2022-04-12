@@ -49,13 +49,13 @@ jobs:
         with:
           args: zip -qq -r ${{ inputs.zip_artifact_path }} .
       - name: Archive artifact
-        if: inputs.zip_artifact_path != '' && GITHUB_REF_NAME != 'master'
+        if: inputs.zip_artifact_path != '' && github.ref_name != 'master'
         uses: actions/upload-artifact@v3
         with:
           name: output-artifact
           path: ${{ inputs.zip_artifact_path }}
       - name: Archive artifact only on master
-        if: inputs.zip_artifact_path != '' && GITHUB_REF_NAME == 'master'
+        if: inputs.zip_artifact_path != '' && github.ref_name == 'master'
         uses: actions/upload-artifact@v3
         with:
           name: output-artifact
