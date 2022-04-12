@@ -5,6 +5,14 @@ on:
       node_version:
         required: true
         type: string
+      lint:
+        required: false
+        default: false
+        type: boolean
+      zip_artifact:
+        required: false
+        default: ${{ github.event.repository.name }}
+        type: string
     secrets:
       NPM_TOKEN:
         required: true
@@ -31,8 +39,23 @@ jobs:
           cache: 'npm'
       - name: Install dependencies
         if: steps.cache-nodemodules.outputs.cache-hit != 'true' || github.ref_name == 'master'
-        run: npm install --unsafe-perm
+        run: |
+          ${{ inputs.install_additional_commands}}
+          npm install
       - name: Lint
+        if: inputs.lint == true
         run: npm run lint
       - name: Test
         run: npm run test
+      - name: Build artifacts
+        if: inputs.zip_artifact != 0
+        uses: montudor/action-zip@v1
+        with:
+          args: zip -qq -r ${{ inputs.zip_artifact }} .
+      - name: Archive artifact
+        if: inputs.zip_artifact != 0
+        uses: actions/upload-artifact@v3
+        with:
+          name: output-jar
+          path: ${{ inputs.zip_artifact }}
+          retention-days: 365
