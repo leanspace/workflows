@@ -9,9 +9,8 @@ on:
         required: false
         default: false
         type: boolean
-      zip_artifact:
+      zip_artifact_path:
         required: false
-        default: ${{ github.event.repository.name }}
         type: string
     secrets:
       NPM_TOKEN:
@@ -56,6 +55,6 @@ jobs:
         if: inputs.zip_artifact != ''
         uses: actions/upload-artifact@v3
         with:
-          name: output-jar
+          name: output-artifact
           path: ${{ inputs.zip_artifact }}
           retention-days: 365
