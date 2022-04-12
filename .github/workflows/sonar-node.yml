@@ -47,14 +47,14 @@ jobs:
       - name: Test
         run: npm run test
       - name: Build artifacts
-        if: inputs.zip_artifact != ''
+        if: inputs.zip_artifact_path != ''
         uses: montudor/action-zip@v1
         with:
-          args: zip -qq -r ${{ inputs.zip_artifact }} .
+          args: zip -qq -r ${{ inputs.zip_artifact_path }} .
       - name: Archive artifact
-        if: inputs.zip_artifact != ''
+        if: inputs.zip_artifact_path != ''
         uses: actions/upload-artifact@v3
         with:
           name: output-artifact
-          path: ${{ inputs.zip_artifact }}
+          path: ${{ inputs.zip_artifact_path }}
           retention-days: 365
