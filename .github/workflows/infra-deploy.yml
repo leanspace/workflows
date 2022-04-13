@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Set env
-        run: echo "ARTIFACT_IDENTIFIER=0.1.${GITHUB_RUN_ATTEMPT}_${GITHUB_SHA:0:6}" >> $GITHUB_ENV
+        run: echo "ARTIFACT_IDENTIFIER=0.1.${GITHUB_RUN_NUMBER}_${GITHUB_RUN_ATTEMPT}_${GITHUB_SHA:0:7}" >> $GITHUB_ENV
       - name: Trigger jenkins infra script
         if: github.ref_name == 'master'
         uses: toptal/jenkins-job-trigger-action@master
