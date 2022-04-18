@@ -17,12 +17,12 @@ jobs:
       - name: Set env
         run: echo "ARTIFACT_IDENTIFIER=0.1.${GITHUB_RUN_NUMBER}_${GITHUB_RUN_ATTEMPT}_${GITHUB_SHA:0:7}" >> $GITHUB_ENV
       - name: Trigger jenkins infra script
-        # if: github.ref_name == 'master'
+        if: github.ref_name == 'master'
         env:
           JENKINS_TOKEN: ${{ secrets.JENKINS_TOKEN }}
           JENKINS_USER: ${{ secrets.JENKINS_USER }}
           PARAMETER_NAME: ${{ inputs.param }}
-        run: "curl -v -X POST --user \"$JENKINS_USER:$JENKINS_TOKEN\" \
+        run: "curl -X POST --user \"$JENKINS_USER:$JENKINS_TOKEN\" \
           'https://build.leanspace.io/jenkins/job/leanspace/job/leanspace-infra/job/master/buildWithParameters' \
           -H 'Content-Type: application/x-www-form-urlencoded' --data-urlencode \
           \"$PARAMETER_NAME=$ARTIFACT_IDENTIFIER\""
