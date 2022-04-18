@@ -19,13 +19,10 @@ jobs:
       - name: Trigger jenkins infra script
         if: github.ref_name == 'master'
         uses: toptal/jenkins-job-trigger-action@master
-        with:
-          jenkins_url: "https://build.leanspace.io/jenkins/"
-          jenkins_user: ${{ secrets.JENKINS_USER }}
-          jenkins_token: ${{ secrets.JENKINS_TOKEN }}
-          job_name: "leanspace/job/leanspace-infra/job/master"
-          job_params: |
-            {
-              "${{ inputs.param }}" : "${{ env.ARTIFACT_IDENTIFIER }}"
-            }
-          async: true
+        env:
+          JENKINS_TOKEN: ${{ secrets.JENKINS_TOKEN }}
+          PARAMETER_NAME: ${{ inputs.param }}
+        run: "curl --location --request POST 'https://build.leanspace.io/jenkins/job/leanspace/job/leanspace-infra/job/master/buildWithParameters' \
+          --header 'Authorization: Basic $JENKINS_TOKEN' \
+          --header 'Content-Type: application/x-www-form-urlencoded' \
+          --data-urlencode '$PARAMETER_NAME=$ARTIFACT_IDENTIFIER'"
