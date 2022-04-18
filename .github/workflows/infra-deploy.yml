@@ -20,8 +20,9 @@ jobs:
         # if: github.ref_name == 'master'
         env:
           JENKINS_TOKEN: ${{ secrets.JENKINS_TOKEN }}
+          JENKINS_USER: ${{ secrets.JENKINS_USER }}
           PARAMETER_NAME: ${{ inputs.param }}
-        run: "curl --location --request POST 'https://build.leanspace.io/jenkins/job/leanspace/job/leanspace-infra/job/master/buildWithParameters' \
-          --header 'Authorization: Basic $JENKINS_TOKEN' \
-          --header 'Content-Type: application/x-www-form-urlencoded' \
-          --data-urlencode '$PARAMETER_NAME=$ARTIFACT_IDENTIFIER'"
+        run: "curl -X POST --user '$JENKINS_USER:$JENKINS_TOKEN' \
+          'https://build.leanspace.io/jenkins/job/leanspace/job/leanspace-infra/job/master/buildWithParameters' \
+          -H 'Content-Type: application/x-www-form-urlencoded' --data-urlencode \
+          '$PARAMETER_NAME=$ARTIFACT_IDENTIFIER'"
