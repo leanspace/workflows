@@ -63,7 +63,7 @@ jobs:
       - name: Push artifacts to s3
         if: inputs.s3_bucket != '' #&& github.ref_name != 'master'
         run: |
-          echo "ARTIFACT_IDENTIFIER=0.1.${GITHUB_RUN_NUMBER}_${GITHUB_RUN_ATTEMPT}_${GITHUB_SHA:0:7}" >> $GITHUB_ENV
+          ARTIFACT_IDENTIFIER=0.1.${GITHUB_RUN_NUMBER}_${GITHUB_RUN_ATTEMPT}_${GITHUB_SHA:0:7}
           aws s3 cp ${{ inputs.zip_artifact_path }} ${{ inputs.s3_bucket }}/$ARTIFACT_IDENTIFIER/develop
           aws s3 cp ${{ inputs.s3_bucket }}/$ARTIFACT_IDENTIFIER/develop ${{ inputs.s3_bucket }}/$ARTIFACT_IDENTIFIER/demo
           aws s3 cp ${{ inputs.s3_bucket }}/$ARTIFACT_IDENTIFIER/develop ${{ inputs.s3_bucket }}/$ARTIFACT_IDENTIFIER/prod
