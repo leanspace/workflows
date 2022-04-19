@@ -18,14 +18,11 @@ jobs:
         run: echo "ARTIFACT_IDENTIFIER=0.1.${GITHUB_RUN_NUMBER}_${GITHUB_RUN_ATTEMPT}_${GITHUB_SHA:0:7}" >> $GITHUB_ENV
       - name: Trigger jenkins infra script
         if: github.ref_name == 'master'
-        uses: toptal/jenkins-job-trigger-action@master
+        uses: fjogeleit/http-request-action@v1.8.2
         with:
-          jenkins_url: "https://build.leanspace.io/jenkins/"
-          jenkins_user: ${{ secrets.JENKINS_USER }}
-          jenkins_token: ${{ secrets.JENKINS_TOKEN }}
-          job_name: "leanspace/job/leanspace-infra/job/master"
-          job_params: |
-            {
-              "${{ inputs.param }}" : "${{ env.ARTIFACT_IDENTIFIER }}"
-            }
-          async: true
+          url: 'https://build.leanspace.io/jenkins/job/leanspace/job/leanspace-infra/job/master/buildWithParameters'
+          method: 'POST'
+          username: ${{ secrets.JENKINS_USER }}
+          password: ${{ secrets.JENKINS_TOKEN }}
+          data: ${{ format('{0}={1}', inputs.param, env.ARTIFACT_IDENTIFIER) }}
+          customHeaders: '{ "Content-Type": "application/x-www-form-urlencoded" }'
