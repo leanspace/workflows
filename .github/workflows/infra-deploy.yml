@@ -22,7 +22,7 @@ jobs:
           JENKINS_TOKEN: ${{ secrets.JENKINS_TOKEN }}
           JENKINS_USER: ${{ secrets.JENKINS_USER }}
           PARAMETER_NAME: ${{ inputs.param }}
-        run: "curl -X POST --user \"$JENKINS_USER:$JENKINS_TOKEN\" \
+        run: "curl -X POST --user \"$JENKINS_USER\" \
           'https://build.leanspace.io/jenkins/job/leanspace/job/leanspace-infra/job/master/buildWithParameters' \
           -H 'Content-Type: application/x-www-form-urlencoded' --data-urlencode \
-          \"$PARAMETER_NAME=$ARTIFACT_IDENTIFIER\""
+          \"$PARAMETER_NAME=$ARTIFACT_IDENTIFIER\" --fail-with-body"
