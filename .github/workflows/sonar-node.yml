@@ -42,7 +42,6 @@ jobs:
           node-version: ${{ inputs.node_version }}
           cache: 'npm'
       - name: Install dependencies
-        if: steps.cache-nodemodules.outputs.cache-hit != 'true' || github.ref_name == 'master'
         run: npm install
       - name: Lint
         if: inputs.lint == true
@@ -64,6 +63,4 @@ jobs:
         if: inputs.s3_bucket != '' && github.ref_name != 'master'
         run: |
           ARTIFACT_IDENTIFIER=0.1.${GITHUB_RUN_NUMBER}_${GITHUB_RUN_ATTEMPT}_${GITHUB_SHA:0:7}
-          aws s3 cp ${{ inputs.zip_artifact_path }} ${{ inputs.s3_bucket }}/$ARTIFACT_IDENTIFIER/develop/${{ inputs.zip_artifact_path }}
-          aws s3 cp ${{ inputs.zip_artifact_path }} ${{ inputs.s3_bucket }}/$ARTIFACT_IDENTIFIER/demo/${{ inputs.zip_artifact_path }}
-          aws s3 cp ${{ inputs.zip_artifact_path }} ${{ inputs.s3_bucket }}/$ARTIFACT_IDENTIFIER/prod/${{ inputs.zip_artifact_path }}
+          aws s3 cp ${{ inputs.zip_artifact_path }} ${{ inputs.s3_bucket }}/$ARTIFACT_IDENTIFIER/${{ inputs.zip_artifact_path }}
