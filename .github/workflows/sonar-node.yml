@@ -54,13 +54,13 @@ jobs:
         with:
           args: zip -qq -r ${{ inputs.zip_artifact_path }} .
       - name: Configure AWS Credentials
-        if: inputs.s3_bucket != '' #&& github.ref_name != 'master'
+        if: inputs.s3_bucket != '' && github.ref_name != 'master'
         uses: aws-actions/configure-aws-credentials@v1
         with:
           role-to-assume: arn:aws:iam::603457443348:role/GithubActionsS3Access
           aws-region: eu-central-1
       - name: Push artifacts to s3
-        if: inputs.s3_bucket != '' #&& github.ref_name != 'master'
+        if: inputs.s3_bucket != '' && github.ref_name != 'master'
         run: |
           ARTIFACT_IDENTIFIER=0.1.${GITHUB_RUN_NUMBER}_${GITHUB_RUN_ATTEMPT}_${GITHUB_SHA:0:7}
           aws s3 cp ${{ inputs.zip_artifact_path }} ${{ inputs.s3_bucket }}/$ARTIFACT_IDENTIFIER/${{ inputs.zip_artifact_path }}
