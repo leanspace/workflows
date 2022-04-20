@@ -1,0 +1,66 @@
+name: "Sonar-node-s3"
+on:
+  workflow_call:
+    inputs:
+      node_version:
+        required: true
+        type: string
+      lint:
+        required: false
+        default: false
+        type: boolean
+      zip_artifact_path:
+        required: false
+        type: string
+      s3_bucket:
+        required: false
+        type: string
+    secrets:
+      NPM_TOKEN:
+        required: true
+      SONAR_TOKEN:
+        required: true
+jobs:
+  sonar-node-s3:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          NEXUS_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Install node
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ inputs.node_version }}
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm install
+      - name: Lint
+        if: inputs.lint == true
+        run: npm run lint
+      - name: Test
+        run: npm run test
+      - name: Build artifacts
+        if: inputs.zip_artifact_path != ''
+        uses: montudor/action-zip@v1
+        with:
+          args: zip -qq -r ${{ inputs.zip_artifact_path }} .
+      - name: Configure AWS Credentials
+        if: inputs.s3_bucket != '' && github.ref_name != 'master'
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::603457443348:role/GithubActionsS3Access
+          aws-region: eu-central-1
+      - name: Push artifacts to s3
+        if: inputs.s3_bucket != '' && github.ref_name != 'master'
+        run: |
+          ARTIFACT_IDENTIFIER=0.1.${GITHUB_RUN_NUMBER}_${GITHUB_RUN_ATTEMPT}_${GITHUB_SHA:0:7}
+          aws s3 cp ${{ inputs.zip_artifact_path }} ${{ inputs.s3_bucket }}/$ARTIFACT_IDENTIFIER/${{ inputs.zip_artifact_path }}
