@@ -16,13 +16,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Configure AWS Credentials
-        if: github.ref_name == 'master'
+        # if: github.ref_name == 'master'
         uses: aws-actions/configure-aws-credentials@v1
         with:
           role-to-assume: arn:aws:iam::603457443348:role/GithubActionsParameterStoreAccess
           aws-region: eu-central-1
       - name: Add version of build to parameter store
-        if: github.ref_name == 'master'
+        # if: github.ref_name == 'master'
         env:
           PARAMETER: ${{ inputs.parameter_store_path }}
           VALUE: ${{ inputs.version_identifier }}
