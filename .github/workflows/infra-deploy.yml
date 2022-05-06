@@ -2,7 +2,10 @@ name: "Trigger jenkins infra script"
 on:
   workflow_call:
     inputs:
-      param:
+      parameter_name:
+        required: true
+        type: string
+      version_identifier:
         required: true
         type: string
     secrets:
@@ -14,8 +17,6 @@ jobs:
   infra:
     runs-on: ubuntu-latest
     steps:
-      - name: Set env
-        run: echo "ARTIFACT_IDENTIFIER=0.1.${GITHUB_RUN_NUMBER}_${GITHUB_RUN_ATTEMPT}_${GITHUB_SHA:0:7}" >> $GITHUB_ENV
       - name: Trigger jenkins infra script
         if: github.ref_name == 'master'
         uses: fjogeleit/http-request-action@v1.8.2
@@ -24,5 +25,5 @@ jobs:
           method: 'POST'
           username: ${{ secrets.JENKINS_USER }}
           password: ${{ secrets.JENKINS_TOKEN }}
-          data: ${{ format('{0}={1}', inputs.param, env.ARTIFACT_IDENTIFIER) }}
+          data: ${{ format('{0}={1}', inputs.parameter_name, inputs.version_identifier) }}
           customHeaders: '{ "Content-Type": "application/x-www-form-urlencoded" }'
