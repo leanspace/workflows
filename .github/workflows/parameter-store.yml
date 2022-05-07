@@ -8,6 +8,11 @@ on:
       parameter_store_path:
         required: true
         type: string
+    secrets:
+      ACCOUNT_ID:
+        required: true
+      AWS_REGION:
+        required: true
 jobs:
   parameter-store:
     permissions:
@@ -19,8 +24,8 @@ jobs:
         # if: github.ref_name == 'master'
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          role-to-assume: arn:aws:iam::603457443348:role/GithubActionsParameterStoreAccess
-          aws-region: eu-central-1
+          role-to-assume: ${{ format('arn:aws:iam::{0}:role/GithubActionsParameterStoreAccess', secrets.ACCOUNT_ID) }}
+          aws-region: ${{ secrets.ACCOUNT_ID }}
       - name: Add version of build to parameter store
         # if: github.ref_name == 'master'
         env:
