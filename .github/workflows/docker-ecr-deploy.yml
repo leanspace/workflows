@@ -5,6 +5,9 @@ on:
       build-args:
         required: false
         type: string
+      version-identifier:
+        required: true
+        type: string
       needs-intermediate-artifact:
         required: false
         default: false
@@ -13,6 +16,11 @@ on:
         required: false
         default: ${{ github.event.repository.name }}
         type: string
+    secrets:
+      ACCOUNT_ID:
+        required: true
+      AWS_REGION:
+        required: true
 jobs:
   dockerBuild-ECRpush:
     runs-on: ubuntu-latest
@@ -24,17 +32,15 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - name: Set env
-        run: echo "ARTIFACT_IDENTIFIER=0.1.${GITHUB_RUN_NUMBER}_${GITHUB_RUN_ATTEMPT}_${GITHUB_SHA:0:7}" >> $GITHUB_ENV
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          role-to-assume: arn:aws:iam::603457443348:role/GithubActionsECRAccess
-          aws-region: eu-central-1
+          role-to-assume: ${{ format('arn:aws:iam::{0}:role/GithubActionsECRAccess', secrets.ACCOUNT_ID) }}
+          aws-region: ${{ secrets.AWS_REGION }}
       - name: Login to Amazon ECR
         uses: docker/login-action@v1
         with:
-          registry: 603457443348.dkr.ecr.eu-central-1.amazonaws.com
+          registry: ${{ format('{0}.dkr.ecr.eu-central-1.amazonaws.com', secrets.ACCOUNT_ID) }}
       - name: Download jar artifact
         if: inputs.needs-intermediate-artifact == true
         with:
@@ -46,14 +52,14 @@ jobs:
           push: false
           context: .
           build-args: ${{ inputs.build-args }}
-          tags: "603457443348.dkr.ecr.eu-central-1.amazonaws.com/${{ inputs.repo-name }}:${{ env.ARTIFACT_IDENTIFIER }}"
+          tags: ${{ format('{0}.dkr.ecr.eu-central-1.amazonaws.com/{1}:{2}', secrets.ACCOUNT_ID, inputs.repo-name, env.version-identifier) }}
       - name: Build and push
-        if: github.ref_name == 'master'
+        # if: github.ref_name == 'master'
         uses: docker/build-push-action@v2
         with:
           push: true
           context: .
           build-args: ${{ inputs.build-args }}
           tags: |
-            "603457443348.dkr.ecr.eu-central-1.amazonaws.com/${{ inputs.repo-name }}:${{ env.ARTIFACT_IDENTIFIER }}"
-            "603457443348.dkr.ecr.eu-central-1.amazonaws.com/${{ inputs.repo-name }}:latest"
+            ${{ format('{0}.dkr.ecr.eu-central-1.amazonaws.com/{1}:{2}', secrets.ACCOUNT_ID, inputs.repo-name, env.version-identifier) }}
+            ${{ format('{0}.dkr.ecr.eu-central-1.amazonaws.com/{1}:latest', secrets.ACCOUNT_ID, inputs.repo-name) }}
