@@ -73,7 +73,7 @@ jobs:
     - name: Deploy to nexus
       env:
         VERSION_IDENTIFIER: ${{ inputs.version-identifier }}
-      if: inputs.nexus-deployment #github.ref_name == 'master' &&
+      if: github.ref_name == 'master' && inputs.nexus-deployment
       run: mvn deploy -DskipTests -gs config-files/maven/nexus-config.xml -Drevision=${VERSION_IDENTIFIER}
     # Only upload artifact if path is set
     - name: 'Upload jar artifact'
