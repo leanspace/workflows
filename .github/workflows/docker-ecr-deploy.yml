@@ -52,7 +52,7 @@ jobs:
           push: false
           context: .
           build-args: ${{ inputs.build-args }}
-          tags: ${{ format('{0}.dkr.ecr.eu-central-1.amazonaws.com/{1}:{2}', secrets.ACCOUNT_ID, inputs.repo-name, env.version-identifier) }}
+          tags: ${{ format('{0}.dkr.ecr.eu-central-1.amazonaws.com/{1}:{2}', secrets.ACCOUNT_ID, inputs.repo-name, inputs.version-identifier) }}
       - name: Build and push
         # if: github.ref_name == 'master'
         uses: docker/build-push-action@v2
@@ -61,5 +61,5 @@ jobs:
           context: .
           build-args: ${{ inputs.build-args }}
           tags: |
-            ${{ format('{0}.dkr.ecr.eu-central-1.amazonaws.com/{1}:{2}', secrets.ACCOUNT_ID, inputs.repo-name, env.version-identifier) }}
+            ${{ format('{0}.dkr.ecr.eu-central-1.amazonaws.com/{1}:{2}', secrets.ACCOUNT_ID, inputs.repo-name, inputs.version-identifier) }}
             ${{ format('{0}.dkr.ecr.eu-central-1.amazonaws.com/{1}:latest', secrets.ACCOUNT_ID, inputs.repo-name) }}
