@@ -2,10 +2,10 @@ name: "Upload version to parameter store"
 on:
   workflow_call:
     inputs:
-      version_identifier:
+      version-identifier:
         required: true
         type: string
-      parameter_store_path:
+      parameter-store-path:
         required: true
         type: string
     secrets:
@@ -29,6 +29,6 @@ jobs:
       - name: Add version of build to parameter store
         if: github.ref_name == 'master'
         env:
-          PARAMETER: ${{ inputs.parameter_store_path }}
-          VALUE: ${{ inputs.version_identifier }}
+          PARAMETER: ${{ inputs.parameter-store-path }}
+          VALUE: ${{ inputs.version-identifier }}
         run: aws ssm put-parameter --name $PARAMETER --value $VALUE --overwrite
