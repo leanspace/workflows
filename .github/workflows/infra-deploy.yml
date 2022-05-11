@@ -2,7 +2,7 @@ name: "Trigger jenkins infra script"
 on:
   workflow_call:
     inputs:
-      parameter-name:
+      project-code:
         required: true
         type: string
       version-identifier:
@@ -25,5 +25,5 @@ jobs:
           method: 'POST'
           username: ${{ secrets.JENKINS_USER }}
           password: ${{ secrets.JENKINS_TOKEN }}
-          data: ${{ format('{0}={1}', inputs.parameter-name, inputs.version-identifier) }}
+          data: ${{ format('{0}={1}', inputs.project-code, inputs.version-identifier) }}
           customHeaders: '{ "Content-Type": "application/x-www-form-urlencoded" }'

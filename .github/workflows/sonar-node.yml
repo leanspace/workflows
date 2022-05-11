@@ -2,11 +2,12 @@ name: "Sonar-node-s3"
 on:
   workflow_call:
     inputs:
-      node-version:
-        required: true
-        type: string
       version-identifier:
         required: true
+        type: string
+      node-version:
+        required: false
+        default: 14
         type: string
       lint:
         required: false
