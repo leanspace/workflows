@@ -5,6 +5,9 @@ on:
       version-identifier:
         required: true
         type: string
+      test-arguments:
+        required: false
+        type: string
       node-version:
         required: false
         default: 14
@@ -55,7 +58,9 @@ jobs:
         if: inputs.lint == true
         run: npm run lint
       - name: Test
-        run: npm run test
+        env:
+          ARGS: ${{ inputs.test-arguments }}
+        run: npm run test $ARGS
       - name: Build artifacts
         if: inputs.zip-artifact-path != ''
         uses: montudor/action-zip@v1
