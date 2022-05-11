@@ -1,0 +1,34 @@
+name: "Upload version to parameter store"
+on:
+  workflow_call:
+    inputs:
+      version-identifier:
+        required: true
+        type: string
+      parameter-store-path:
+        required: true
+        type: string
+    secrets:
+      ACCOUNT_ID:
+        required: true
+      AWS_REGION:
+        required: true
+jobs:
+  parameter-store:
+    permissions:
+      id-token: write
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure AWS Credentials
+        if: github.ref_name == 'master'
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: ${{ format('arn:aws:iam::{0}:role/GithubActionsParameterStoreAccess', secrets.ACCOUNT_ID) }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: Add version of build to parameter store
+        if: github.ref_name == 'master'
+        env:
+          PARAMETER: ${{ inputs.parameter-store-path }}
+          VALUE: ${{ inputs.version-identifier }}
+        run: aws ssm put-parameter --name $PARAMETER --value $VALUE --overwrite
