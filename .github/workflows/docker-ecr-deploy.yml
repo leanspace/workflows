@@ -54,7 +54,7 @@ jobs:
           build-args: ${{ inputs.build-args }}
           tags: ${{ format('{0}.dkr.ecr.{1}.amazonaws.com/{2}:{3}', secrets.ACCOUNT_ID, secrets.AWS_REGION, inputs.repo-name, inputs.version-identifier) }}
       - name: Build and push
-        if: github.ref_name == 'master'
+        if: github.ref_name == 'master' || github.ref_name == 'main'
         uses: docker/build-push-action@v2
         with:
           push: true
