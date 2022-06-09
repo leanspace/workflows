@@ -20,8 +20,19 @@ on:
 jobs:
   infra:
     runs-on: ubuntu-latest
-    environment: development
     steps:
+      - uses: avakar/create-deployment@v1
+        id: deployment
+        with:
+          auto_merge: false
+          environment: development
+        env:
+          GITHUB_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
+      - name: Deployment outputs
+        run: |
+          echo ${{ steps.deployment.outputs.deployment_id }}
+          echo ${{ steps.deployment.outputs.deployment_url }}
+          echo ${{ steps.deployment.outputs.statuses_url }}
       - name: Trigger jenkins infra script
         uses: fjogeleit/http-request-action@v1.8.2
         with:
