@@ -24,6 +24,7 @@ jobs:
       - uses: avakar/create-deployment@v1
         id: deployment
         with:
+          ref: ${{ github.head_ref }}
           auto_merge: false
           environment: development
         env:
