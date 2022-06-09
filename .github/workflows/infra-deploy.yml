@@ -27,7 +27,7 @@ jobs:
           auto_merge: false
           environment: development
         env:
-          GITHUB_TOKEN: ${{ secrets.LEANSPACE_BOT_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Deployment outputs
         run: |
           echo ${{ steps.deployment.outputs.deployment_id }}
