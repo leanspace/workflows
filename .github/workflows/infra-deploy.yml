@@ -25,7 +25,7 @@ jobs:
       - name: Trigger jenkins infra script
         uses: fjogeleit/http-request-action@v1.8.2
         with:
-          url: "https://build.leanspace.io/jenkins/job/leanspace/job/leanspace-infra/job/master/buildWithParameters"
+          url: "https://build.leanspace.io/jenkins/job/Leanspace-infra/job/master/buildWithParameters"
           method: "POST"
           username: ${{ secrets.JENKINS_USER }}
           password: ${{ secrets.JENKINS_TOKEN }}
