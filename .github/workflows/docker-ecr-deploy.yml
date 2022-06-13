@@ -12,6 +12,11 @@ on:
         required: false
         default: false
         type: boolean
+      severity-threshold:
+        description: "Severity threshold for the scans low|medium|high|critical"
+        required: false
+        default: medium
+        type: string
       repo-name:
         required: false
         default: ${{ github.event.repository.name }}
@@ -53,6 +58,57 @@ jobs:
           context: .
           build-args: ${{ inputs.build-args }}
           tags: ${{ format('{0}.dkr.ecr.{1}.amazonaws.com/{2}:{3}', secrets.ACCOUNT_ID, secrets.AWS_REGION, inputs.repo-name, inputs.version-identifier) }}
+
+### My Part ###
+
+      - name: Security scan on docker image
+        uses: snyk/actions/docker@master
+        id: docker-image-scan
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          image: ${{ format('{0}.dkr.ecr.{1}.amazonaws.com/{2}:{3}', secrets.ACCOUNT_ID, secrets.AWS_REGION, inputs.repo-name, inputs.version-identifier) }}
+          args: --file=./Dockerfile --severity-threshold=${{ github.event.inputs.severity-threshold }} --app-vulns --tags=repo=${{ github.event.inputs.repo-name }}
+          command: test
+          sarif: false
+          json: true
+
+      - run: |
+          mkdir scan-reports
+          mv snyk.json ./scan-reports/report.json
+
+      - name: Uploading scan results to Snyk UI
+        if: ${{ steps.docker-image-scan.outcome == 'failure' }}
+        uses: snyk/actions/docker@master
+        id: docker-image-scan-upload
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          image: ${{ format('{0}.dkr.ecr.{1}.amazonaws.com/{2}:{3}', secrets.ACCOUNT_ID, secrets.AWS_REGION, inputs.repo-name, inputs.version-identifier) }}
+          args: --file=./${{ github.event.inputs.docker-dir }}/Dockerfile --severity-threshold=${{ github.event.inputs.severity-threshold }} --app-vulns --tags=repo=${{ github.event.inputs.repo-name }}
+          command: monitor
+          sarif: false
+          json: false
+
+      - run: npm install snyk-to-html -g
+
+      - name: Generating html report
+        run: snyk-to-html -i ./scan-reports/report.json -o ./scan-reports/report.html
+
+      - name: Exporting the scan results to repo
+        uses: actions/upload-artifact@v3
+        with:
+          name: Scan_Report
+          path: ./scan-reports/report.html
+
+      - name: Scan validation gate
+        if: ${{ steps.docker-image-scan.outcome == 'failure' }}
+        run: exit 1
+
+### My Part ###
+
       - name: Build and push
         if: github.ref_name == 'master' || github.ref_name == 'main'
         uses: docker/build-push-action@v2
