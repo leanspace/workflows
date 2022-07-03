@@ -1,0 +1,25 @@
+name: Post Deployment Actions
+on: workflow_call
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Repository ID
+        run: echo "repo=$(basename ${{ github.event.repository.name }})" | tee -a $GITHUB_ENV
+      - name: Create a release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: ${{ github.event.deployment.payload.version }}
+          tag_name: ${{ github.event.deployment.payload.version }}
+          target_commitish: ${{ github.event.deployment.sha }}
+          body: ${{ github.event.deployment_status.description }}
+      - name: Releases repo
+        uses: softprops/action-gh-release@v1
+        with:
+          name: "${{ env.repo }}:${{ github.event.deployment.payload.version }}"
+          tag_name: ${{ github.event.deployment.payload.version }}
+          repository: leanspace/backend-env-poc #this should be replaced with leanspace/releases c:
+          target_commitish: master
+          token: ${{ secrets.LEANSPACE_BOT_TOKEN }}
+          body: Successful deployment to dev of repository ${{ env.repo }} with version ${{ github.event.deployment.payload.version }}
