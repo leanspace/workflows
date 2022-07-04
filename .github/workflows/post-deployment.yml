@@ -6,14 +6,16 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Repository ID
-        run: echo "repo=$(basename ${{ github.event.repository.name }})" | tee -a $GITHUB_ENV
+        run: |
+          echo "repo=$(basename ${{ github.event.repository.name }})" | tee -a $GITHUB_ENV
+          echo "platform_version=$(echo ${{ github.event.deployment_status.description }} | cut -d ':' -f1)" | tee -a $GITHUB_ENV
       - name: Create a release
         uses: softprops/action-gh-release@v1
         with:
           name: ${{ github.event.deployment.payload.version }}
           tag_name: ${{ github.event.deployment.payload.version }}
           target_commitish: ${{ github.event.deployment.sha }}
-          body: ${{ github.event.deployment_status.description }}
+          body: Successful deployment to dev of version ${{ github.event.deployment.payload.version }} with platform version ${{ env.platform_version }}
       - name: Releases repo
         uses: softprops/action-gh-release@v1
         with:
@@ -22,4 +24,4 @@ jobs:
           repository: leanspace/releases
           target_commitish: main
           token: ${{ secrets.LEANSPACE_BOT_TOKEN }}
-          body: Successful deployment to dev of repository ${{ env.repo }} with version ${{ github.event.deployment.payload.version }}
+          body: Successful deployment to dev ${{ env.platform_version }} of repository ${{ env.repo }} with version ${{ github.event.deployment.payload.version }}
