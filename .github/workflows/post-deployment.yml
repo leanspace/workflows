@@ -5,23 +5,41 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
       - name: Repository identifier and platform identifier
         run: |
           echo "repo=$(basename ${{ github.event.repository.name }})" | tee -a $GITHUB_ENV
-          echo "platform_version=$(echo ${{ github.event.deployment_status.description }} | cut -d ':' -f1)" | tee -a $GITHUB_ENV
-      - name: Create a release
+          version=$(echo ${{ github.event.deployment_status.description }} | cut -d ':' -f1)
+          echo "platform_version=$version" | tee -a $GITHUB_ENV
+          echo "jenkins_job=$(echo $version | cut -d '_' -f1 | cut -d '.' -f3)" | tee -a $GITHUB_ENV
+         
+      - name: Service Release
         uses: softprops/action-gh-release@v1
         with:
           name: ${{ github.event.deployment.payload.version }}
           tag_name: ${{ github.event.deployment.payload.version }}
           target_commitish: ${{ github.event.deployment.sha }}
           body: Successful deployment to dev of version ${{ github.event.deployment.payload.version }} with platform version ${{ env.platform_version }}
-      - name: Releases repo
-        uses: softprops/action-gh-release@v1
+      
+      - name: Get artifact from Jenkins build
+        id: jenkins
+        uses: fjogeleit/http-request-action@v1.8.2
         with:
-          name: "${{ env.repo }}:${{ github.event.deployment.payload.version }}"
-          tag_name: ${{ github.event.deployment.payload.version }}
-          repository: leanspace/releases
-          target_commitish: main
-          token: ${{ secrets.LEANSPACE_BOT_TOKEN }}
-          body: Successful deployment to dev ${{ env.platform_version }} of repository ${{ env.repo }} with version ${{ github.event.deployment.payload.version }}
+          url: "https://build.leanspace.io/jenkins/job/Leanspace-infra/job/master/${{ env.jenkins_job }}/artifact/platformVersion.json"
+          method: "GET"
+          username: ${{ secrets.JENKINS_USER }}
+          password: ${{ secrets.JENKINS_TOKEN }}
+          customHeaders: '{ "Content-Type": "application/x-www-form-urlencoded" }'
+
+      - name: Output of request
+        run: echo ${{ steps.jenkins.outputs.response }}
+      # - name: Platform Release
+      #   uses: softprops/action-gh-release@v1
+      #   with:
+      #     name: "${{ env.platform_version }}"
+      #     tag_name: ${{ github.event.deployment.payload.version }}
+      #     repository: leanspace/releases
+      #     target_commitish: main
+      #     token: ${{ secrets.LEANSPACE_BOT_TOKEN }}
+      #     body: Successful deployment to dev ${{ env.platform_version }} of repository ${{ env.repo }} with version ${{ github.event.deployment.payload.version }}
+      #     files: 
