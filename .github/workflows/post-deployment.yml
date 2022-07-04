@@ -19,7 +19,7 @@ jobs:
         with:
           name: "${{ env.repo }}:${{ github.event.deployment.payload.version }}"
           tag_name: ${{ github.event.deployment.payload.version }}
-          repository: leanspace/backend-env-poc #this should be replaced with leanspace/releases c:
-          target_commitish: master
+          repository: leanspace/releases
+          target_commitish: main
           token: ${{ secrets.LEANSPACE_BOT_TOKEN }}
           body: Successful deployment to dev of repository ${{ env.repo }} with version ${{ github.event.deployment.payload.version }}
