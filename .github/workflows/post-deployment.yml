@@ -70,6 +70,7 @@ jobs:
             ))
 
   parameter-store-update:
+    if: github.event.deployment_status.state == 'success'
     permissions:
       id-token: write
       contents: read
