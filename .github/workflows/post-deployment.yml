@@ -33,10 +33,22 @@ jobs:
       - name: Store platform versions
         run: echo ${{ steps.jenkins.outputs.response }} >> platformVersion.json
 
+      - uses: actions/checkout@v2
+        with:
+          repository: leanspace/releases
+          token: ${{ secrets.LEANSPACE_BOT_TOKEN }}
+
+      - name: Create annotated tag
+        uses: Anmau1910/action-create-tag-repo@main
+        with:
+          github_token: ${{ secrets.LEANSPACE_BOT_TOKEN }}
+          tag: ${{ env.platform_version }}
+          message: ${{ env.platform_version }}
+          repository: leanspace/releases
+
       - name: Platform Release
         uses: softprops/action-gh-release@v1
         with:
-          name: ${{ env.platform_version }}
           tag_name: ${{ env.platform_version }}
           repository: leanspace/releases
           target_commitish: main
