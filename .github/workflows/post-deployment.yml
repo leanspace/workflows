@@ -20,18 +20,18 @@ jobs:
           target_commitish: ${{ github.event.deployment.sha }}
           body: Successful deployment to dev of version ${{ github.event.deployment.payload.version }} with platform version ${{ env.platform_version }}
 
-      # - name: Get artifact from Jenkins build
-      #   id: jenkins
-      #   uses: fjogeleit/http-request-action@v1.8.2
-      #   with:
-      #     url: "https://build.leanspace.io/jenkins/job/Leanspace-infra/job/master/${{ env.jenkins_job }}/artifact/platformVersion.json"
-      #     method: "GET"
-      #     username: ${{ secrets.JENKINS_USER }}
-      #     password: ${{ secrets.JENKINS_TOKEN }}
-      #     customHeaders: '{ "Content-Type": "application/x-www-form-urlencoded" }'
+      - name: Get artifact from Jenkins build
+        id: jenkins
+        uses: fjogeleit/http-request-action@v1.8.2
+        with:
+          url: "https://build.leanspace.io/jenkins/job/Leanspace-infra/job/master/${{ env.jenkins_job }}/artifact/platformVersion.json"
+          method: "GET"
+          username: ${{ secrets.JENKINS_USER }}
+          password: ${{ secrets.JENKINS_TOKEN }}
+          customHeaders: '{ "Content-Type": "application/x-www-form-urlencoded" }'
 
-      # - name: Store platform versions
-      #   run: echo ${{ steps.jenkins.outputs.response }} >> platformVersion.json
+      - name: Store platform versions
+        run: echo ${{ steps.jenkins.outputs.response }} >> platformVersion.json
 
       - uses: actions/checkout@v2
         with:
@@ -54,47 +54,47 @@ jobs:
           target_commitish: main
           token: ${{ secrets.LEANSPACE_BOT_TOKEN }}
           body: Successful deployment to develop ${{ env.platform_version }} of repository ${{ env.repo }} with version ${{ github.event.deployment.payload.version }}
-          # files: platformVersion.json
+          files: platformVersion.json
 
-  # notify-pr:
-  #   runs-on: ubuntu-latest
-  #   name: Notify PR
-  #   steps:
-  #     - uses: actions/github-script@v6
-  #       with:
-  #         github-token: ${{ secrets.LEANSPACE_BOT_TOKEN }}
-  #         script: |
-  #           const prs = await github.rest.repos.listPullRequestsAssociatedWithCommit({
-  #             owner: context.repo.owner,
-  #             repo: context.repo.repo,
-  #             commit_sha: context.payload.deployment.sha
-  #           });
-  #           await Promise.all(prs.data.map(pullRequest => 
-  #             github.rest.issues.createComment({
-  #               issue_number: pullRequest.number,
-  #               owner: context.repo.owner,
-  #               repo: context.repo.repo,
-  #               body: context.payload.deployment_status.state === 'success' ? 
-  #                     'The change were successfully deployed to the develop environment 🎉' : 
-  #                     `Deployment failed ❌ 
-  #                     [Click here to access the deployment logs](${context.payload.deployment_status.log_url}) and decide if you need to fix something or restart the deployment.`
-  #             })
-  #           ))
+  notify-pr:
+    runs-on: ubuntu-latest
+    name: Notify PR
+    steps:
+      - uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.LEANSPACE_BOT_TOKEN }}
+          script: |
+            const prs = await github.rest.repos.listPullRequestsAssociatedWithCommit({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              commit_sha: context.payload.deployment.sha
+            });
+            await Promise.all(prs.data.map(pullRequest => 
+              github.rest.issues.createComment({
+                issue_number: pullRequest.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: context.payload.deployment_status.state === 'success' ? 
+                      'The change were successfully deployed to the develop environment 🎉' : 
+                      `Deployment failed ❌ 
+                      [Click here to access the deployment logs](${context.payload.deployment_status.log_url}) and decide if you need to fix something or restart the deployment.`
+              })
+            ))
 
-  # parameter-store-update:
-  #   if: github.event.deployment_status.state == 'success'
-  #   permissions:
-  #     id-token: write
-  #     contents: read
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Configure AWS Credentials
-  #       uses: aws-actions/configure-aws-credentials@v1
-  #       with:
-  #         role-to-assume: ${{ format('arn:aws:iam::{0}:role/GithubActionsParameterStoreAccess', secrets.ACCOUNT_ID) }}
-  #         aws-region: ${{ secrets.AWS_REGION }}
-  #     - name: Add version of build to parameter store
-  #       env:
-  #         PARAMETER: ${{ format('/leanspace/build/{0}', github.event.repository.name) }}
-  #         VALUE: ${{ github.event.deployment.payload.version }}
-  #       run: aws ssm put-parameter --name $PARAMETER --value $VALUE --overwrite
+  parameter-store-update:
+    if: github.event.deployment_status.state == 'success'
+    permissions:
+      id-token: write
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: ${{ format('arn:aws:iam::{0}:role/GithubActionsParameterStoreAccess', secrets.ACCOUNT_ID) }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: Add version of build to parameter store
+        env:
+          PARAMETER: ${{ format('/leanspace/build/{0}', github.event.repository.name) }}
+          VALUE: ${{ github.event.deployment.payload.version }}
+        run: aws ssm put-parameter --name $PARAMETER --value $VALUE --overwrite
