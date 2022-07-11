@@ -39,13 +39,14 @@ jobs:
           token: ${{ secrets.LEANSPACE_BOT_TOKEN }}
 
       - name: Create annotated tag
-        uses: Anmau1910/action-create-tag-repo@main
-        with:
-          github_token: ${{ secrets.LEANSPACE_BOT_TOKEN }}
-          tag: ${{ env.platform_version }}
-          message: ${{ env.platform_version }}
-          repository: leanspace/releases
-
+        run: |
+          cd "${GITHUB_WORKSPACE}"
+          git config user.name "${GITHUB_ACTOR}"
+          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+          git tag -a "${{ env.platform_version }}" -m "${{ env.platform_version }}"
+          git remote set-url origin "https://${GITHUB_ACTOR}:${{ secrets.LEANSPACE_BOT_TOKEN }}@github.com/leanspace/releases.git"
+          git push origin "${{ env.platform_version }}"
+          
       - name: Platform Release
         uses: softprops/action-gh-release@v1
         with:
