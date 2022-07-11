@@ -33,7 +33,7 @@ jobs:
       - name: Store platform versions
         run: echo ${{ steps.jenkins.outputs.response }} >> platformVersion.json
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           repository: leanspace/releases
           token: ${{ secrets.LEANSPACE_BOT_TOKEN }}
