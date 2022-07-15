@@ -30,9 +30,6 @@ jobs:
           password: ${{ secrets.JENKINS_TOKEN }}
           customHeaders: '{ "Content-Type": "application/x-www-form-urlencoded" }'
 
-      - name: Store platform versions
-        run: echo ${{ steps.jenkins.outputs.response }} >> platformVersion.json
-
       - uses: actions/checkout@v3
         with:
           repository: leanspace/releases
@@ -47,6 +44,9 @@ jobs:
           git remote set-url origin "https://${GITHUB_ACTOR}:${{ secrets.LEANSPACE_BOT_TOKEN }}@github.com/leanspace/releases.git"
           git push origin "${{ env.platform_version }}"
           
+      - name: Store platform versions
+        run: echo ${{ steps.jenkins.outputs.response }} >> platformVersion.json
+            
       - name: Platform Release
         uses: softprops/action-gh-release@v1
         with:
