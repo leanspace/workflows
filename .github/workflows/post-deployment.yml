@@ -19,20 +19,7 @@ jobs:
           tag_name: ${{ github.event.deployment.payload.version }}
           target_commitish: ${{ github.event.deployment.sha }}
           body: Successful deployment to dev of version ${{ github.event.deployment.payload.version }} with platform version ${{ env.platform_version }}
-
-      - name: Get artifact from Jenkins build
-        id: jenkins
-        uses: fjogeleit/http-request-action@v1.8.2
-        with:
-          url: "https://build.leanspace.io/jenkins/job/Leanspace-infra/job/master/${{ env.jenkins_job }}/artifact/platformVersion.json"
-          method: "GET"
-          username: ${{ secrets.JENKINS_USER }}
-          password: ${{ secrets.JENKINS_TOKEN }}
-          customHeaders: '{ "Content-Type": "application/x-www-form-urlencoded" }'
-
-      - name: Store platform versions
-        run: echo ${{ steps.jenkins.outputs.response }} >> platformVersion.json
-
+      
       - uses: actions/checkout@v3
         with:
           repository: leanspace/releases
@@ -46,7 +33,11 @@ jobs:
           git tag -a "${{ env.platform_version }}" -m "${{ env.platform_version }}"
           git remote set-url origin "https://${GITHUB_ACTOR}:${{ secrets.LEANSPACE_BOT_TOKEN }}@github.com/leanspace/releases.git"
           git push origin "${{ env.platform_version }}"
-          
+      
+      - name: Store platform versions
+        run: |
+          curl https://build.leanspace.io/jenkins/job/Leanspace-infra/job/master/${{ env.jenkins_job }}/artifact/platformVersion.json --user ${{ secrets.JENKINS_USER }}:${{ secrets.JENKINS_TOKEN }} >> platformVersion.json
+            
       - name: Platform Release
         uses: softprops/action-gh-release@v1
         with:
