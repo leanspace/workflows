@@ -35,9 +35,8 @@ jobs:
           git push origin "${{ env.platform_version }}"
       
       - name: Store platform versions
-        run: |
-          curl https://build.leanspace.io/jenkins/job/Leanspace-infra/job/master/${{ env.jenkins_job }}/artifact/platformVersion.json --user ${{ secrets.JENKINS_USER }}:${{ secrets.JENKINS_TOKEN }} >> platformVersion.json
-            
+        run: curl https://build.leanspace.io/jenkins/job/Leanspace-infra/job/master/${{ env.jenkins_job }}/artifact/platformVersion.json --user ${{ secrets.JENKINS_USER }}:${{ secrets.JENKINS_TOKEN }} >> platformVersion.json
+      
       - name: Platform Release
         uses: softprops/action-gh-release@v1
         with:
